@@ -1,0 +1,146 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{framed}
+\usepackage{tikz}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks = true,
+    linkcolor = blue,
+    filecolor = magenta,
+    urlcolor = cyan,
+}
+
+%the comments are from Udacity's project proposal template: https://github.com/udacity/machine-learning/blob/master/projects/capstone/capstone_proposal_template.md
+
+\title{Udacity Machine Learning Nanodegree - Capstone Project Proposal}
+%(approx. 2-3 pages)
+\author{Ruslan Kozhuharov}
+
+\begin{document}
+\pagenumbering{gobble}
+\maketitle
+\tableofcontents
+\newpage
+\pagenumbering{arabic}
+
+\section{Domain Background}
+%(approx. 1-2 paragraphs)
+%In this section, provide brief details on the background information of the domain from which the project is proposed. Historical information relevant to the project should be included. It should be clear how or why a problem in the domain can or should be solved. Related academic research should be appropriately cited in this section, including why that research is relevant. Additionally, a discussion of your personal motivation for investigating a particular problem in the domain is encouraged but not required.
+
+The Kiva organization is a charitable entity that funds underprivileged people around the world through small loans. Such loans are funded on Kiva’s online platform by one or several donors. The loan amount is then disbursed by Kiva associates to financially excluded individuals. Kiva itself does not collect rent on those loans, but Kiva associates could in order to cover their operating costs. Once a loan is repaid, the individual donors could choose another cause and continue their charitable activity. This helps poor communities by:
+\begin{itemize}
+  \item Fostering economic activity
+  \item Providing access to funds for financially excluded individuals
+  \item Encouraging entrepreneurial initiative on the part of the borrower
+\end{itemize}
+In order to improve their reach, however, Kiva needs a good assessment of the poverty levels in their areas of operation. To do that, Kiva has requested in \href{https://www.kaggle.com/kiva/data-science-for-good-kiva-crowdfunding}{a Kaggle challenge} that a poverty score is created based on other data and that score is combined with a dataset for Kiva’s loans from the last 2 years.
+\section{Problem Statement}
+%(approx. 1 paragraph)
+%In this section, clearly describe the problem that is to be solved. The problem described should be well defined and should have at least one relevant potential solution. Additionally, describe the problem thoroughly such that it is clear that the problem is quantifiable (the problem can be expressed in mathematical or logical terms) , measurable (the problem can be measured by some metric and clearly observed), and replicable (the problem can be reproduced and occurs more than once).
+
+In order to address the requirements of Kiva, the poverty score should be derived from external data. Such data should be detailed enough to be able to predict the target metric. In addition, the poverty score itself needs to be defined. Thus, the task of producing a poverty score can be broken down into several sub-tasks:
+\begin{itemize}
+  \item Find a local, detailed and reliable datasource with personal metrics for the region with highest significance for Kiva’s operations (since data for different countries is differently formatted and not always available, we will limit ourselves to one country with reliable data).
+  \item Define the poverty score metric.
+  \item Create a model that predicts the poverty score.
+  \item Join the poverty score to the existing Kiva loans database on borrower gender and region.
+\end{itemize}
+\section{Datasets and Inputs}
+%(approx. 2-3 paragraphs)
+%In this section, the dataset(s) and/or input(s) being considered for the project should be thoroughly described, such as how they relate to the problem and why they should be used. Information such as how the dataset or input is (was) obtained, and the characteristics of the dataset or input, should be included with relevant references and citations as necessary It should be clear how the dataset(s) or input(s) will be used in the project and whether their use is appropriate given the context of the problem.
+
+In order to build the poverty score, we will focus exclusively on the Philippines as this country receives both the highest number of loans and the highest loan amounts from all areas Kiva operates in.
+We will use data from the \href{https://www.kaggle.com/grosvenpaul/family-income-and-expenditure}{Philippines Family Income and Expenditure triennial survey (FIES)}. The data contains information about families’ incomes, expenses, and living conditions (with detailed information about accommodation types, running water, electricity, communications devices, family size, education, etc.). The dataset is published on Kaggle and is produced by the Philippines Statistics Authority (PSA).
+This dataset will be used to derive a model that can predict poverty out of the available features. The poverty score will then be grouped by region and household head gender. We will also derive the administrative regions from the Kiva dataset and join the calculated poverty score by region and gender of the borrower.
+\section{Solution Statement}
+%(approx. 1 paragraph)
+%In this section, clearly describe a solution to the problem. The solution should be applicable to the project domain and appropriate for the dataset(s) or input(s) given. Additionally, describe the solution thoroughly such that it is clear that the solution is quantifiable (the solution can be expressed in mathematical or logical terms) , measurable (the solution can be measured by some metric and clearly observed), and replicable (the solution can be reproduced and occurs more than once).
+
+In order to derive the poverty score, we will normalize the household income from the FIES dataset and use it as a target variable. We will then develop a model that predicts the household income from the other available features in the dataset. We will define the poverty score as the inverse of the normalized income (i.e. 1 - predicted normalized income). In this case, with a predicted income of 0.15 (15\% of the normalized income on a national level), a person would have a poverty score of 0.85 out of 1.
+We will then calculate the poverty score for all individuals in the FIES dataset. Having done that, we will aggregate the results (taking the mean value) by region (administrative region in the Philippines) and household head gender. We will then join these aggregated results to every Kiva loan record by borrower gender and region.
+Finally, we will produce plots that visualize the poverty by region and gender.
+\hypertarget{benchmark}{\section{Benchmark Model}}
+%(approximately 1-2 paragraphs)
+%In this section, provide the details for a benchmark model or result that relates to the domain, problem statement, and intended solution. Ideally, the benchmark model or result contextualizes existing methods or known information in the domain and problem given, which could then be objectively compared to the solution. Describe how the benchmark model or result is measurable (can be measured by some metric and clearly observed) with thorough detail.
+
+Since the normalized values for the household income have a range between 0 and 1, we will use 3 dummy predictors to evaluate the performance of our actual model against:
+\begin{itemize}
+  \item A dummy predictor that always predicts household income 0
+  \item A dummy predictor that always predicts household income 1
+  \item A dummy predictor that always predicts household income 0.5
+\end{itemize}
+We will evaluate these regressors based on our selected evaluation metrics and compare them to our actual model under development.
+\hypertarget{metrics}{\section{Evaluation Metrics}}
+%(approx. 1-2 paragraphs)
+%In this section, propose at least one evaluation metric that can be used to quantify the performance of both the benchmark model and the solution model. The evaluation metric(s) you propose should be appropriate given the context of the data, the problem statement, and the intended solution. Describe how the evaluation metric(s) are derived and provide an example of their mathematical representations (if applicable). Complex evaluation metrics should be clearly defined and quantifiable (can be expressed in mathematical or logical terms).
+
+We will utilize the following evaluation metrics for the household income prediction:
+\begin{itemize}
+  \item Mean squared error:
+    \begin{equation}
+      MSE(y, \hat{y}) = \frac{1}{n_{samples}}\sum_{i=0}^{n_{samples} - 1}(y_i - \hat{y}_i)^2
+    \end{equation}
+  \item R2 score:
+    \begin{equation}
+      R^2(y, \hat{y}) = 1 - \frac{\sum_{i=0}^{n_{samples} - 1}(y_i - \hat{y}_i)^2}{\sum_{i=0}^{n_{samples} - 1}(y_i - \bar{y}_i)^2}
+    \end{equation}
+  \item Mean squared logarithmic error:
+    \begin{equation}
+      MSE(y, \hat{y}) = \frac{1}{n_{samples}}\sum_{i=0}^{n_{samples} - 1}(log_e(1 + y_i) - log_e(1 + \hat{y}_i))^2
+    \end{equation}
+  \item Explained variance score:
+    \begin{equation}
+      EV(y, \hat{y}) = 1 - \frac{Var\{y - \hat{y}\}}{Var\{y\}}
+    \end{equation}
+\end{itemize}
+\section{Project Design}
+%(approx. 1 page)
+%In this final section, summarize a theoretical workflow for approaching a solution given the problem. Provide thorough discussion for what strategies you may consider employing, what analysis of the data might be required before being used, or which algorithms will be considered for your implementation. The workflow and discussion that you provide should align with the qualities of the previous sections. Additionally, you are encouraged to include small visualizations, pseudocode, or diagrams to aid in describing the project design, but it is not required. The discussion should clearly outline your intended workflow of the capstone project.
+
+The project will be organized in the following phases:
+\hypertarget{phase1}{\subsection{FIES Data Cleanup}}
+In this phase, we will perform several standard operations on all the columns of the FIES dataset, namely:
+\begin{enumerate}
+  \item Where appropriate, we will rename the column to a query-friendly name (e.g. 'Total Household Income' will be renamed to 'household\_income').
+  \item Where appropriate, we will map the discrete values of a column to query-friendly names and one hot encode them into several columns (e.g. the 'Household Head Sex' column contains the values 'Male' and 'Female', we can map these values to 0 and 1 respectively and rename the column to 'household\_head\_f').
+  \item Where appropriate, we will reduce the distinct values of a column to few categories (e.g. the 'Household Head Education' column contains various values for every grade completed and every different university degree - we can map these values to: 'elementary', 'primary', 'secondary' and 'tertiary' education levels).
+\end{enumerate}
+\subsection{Kiva Loans Region Matching}
+The Kiva loans ‘region’ column contains unstructured string data. Sometimes the value of the column represents a city name, sometimes a pattern of ‘<city>, <province>’ and sometimes the name of a non-administrative population center. We will attempt to match such locations to a specific region in the Philippines. To do that, we will build a small table reflecting the hierarchy of all major administrative regions and centers in the Philippines as follows:
+\begin{itemize}
+  \item Island Group
+  \item Region
+  \item Province
+  \item Province capital city
+\end{itemize}
+We will use this table and attempt to match various entities from it the strings in the Kiva loans data set. If we find matches, we will assign the corresponding region value from the table to the respective Kiva loan record.
+\subsection{Data Selection}
+We will use the processed data from \hyperlink{phase1}{phase 1} and inspect the correlation patterns between the various features. We will remove features that highly correlate with the target variable (both in semantics and in correlation levels).
+
+\begin{framed}
+Example: the FIES data contains the columns ‘Total Household Income’, ‘Income from Wages’ and ‘Income from Entrepreneurial Activities’. If we are to predict the ‘Total Household Income’, we need to dismiss the ‘Income from Wages’ and ‘Income from Entrepreneurial Activities’ as these fields have the same meaning and therefore cannot be predictors of the ‘Total Household Income’.
+\end{framed}
+
+We will also make an initial assessment on which features are most appropriate based both on correlation levels and common sense.
+\subsection{Initial Model Selection}
+In this phase, we will select a model based on a choice of several out-of-the-box solutions and the dummy scorers from the \hyperlink{benchmark}{Benchmark Mbenchodel} chapter. To select the model, we will compare the performance of all the initial models on the training and validation sets and on the selected evaluation metrics detailed in the \hyperlink{metrics}{Evaluation Metrics} chapter.
+\subsection{Final Model Selection and Feature Set Reduction}
+Out of all the models from the Initial Model Selection, we will choose the best two and inspect the features with highest weights. We will then select the model that has:
+\begin{itemize}
+  \item The most common sense features (e.g. 'occupation\_farmer', 'no\_mobile\_phone', etc.). The purpose of this criterion is to present Kiva with a model that could be converted to questions easily asked in the field. This will allow Kiva and Kiva partners to quickly assess a person’s poverty levels based on simple and straightforward input from the potential borrowers.
+  \item The potential to reduce the number of features to 5 and below. Again the practicality of Kiva's work imposes on us that we are able to have few, clear and crisp input to the model.
+  \item The best performance on the \hyperlink{metrics}{Evaluation Metrics}.
+\end{itemize}
+
+\subsection{Poverty Score Calculation and Application}
+In this phase, we will calculate the poverty score based on the selected model. We will then calculate the mean poverty score by region and gender in the Philippines. We will use these results and join them to Kiva's original loan dataset (again by region and gender) and visualize the results.
+
+\end{document}
+
+%Before submitting your proposal, ask yourself. . .
+%Does the proposal you have written follow a well-organized structure similar to that of the project template?
+%Is each section (particularly Solution Statement and Project Design) written in a clear, concise and specific fashion? Are there any ambiguous terms or phrases that need clarification?
+%Would the intended audience of your project be able to understand your proposal?
+%Have you properly proofread your proposal to assure there are minimal grammatical and spelling mistakes?
+%Are all the resources used for this project correctly cited and referenced?

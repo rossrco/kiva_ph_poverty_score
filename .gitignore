@@ -105,3 +105,11 @@ venv.bak/
 
 # data files
 *.csv
+
+# LateX compilation artefacts
+*.aux
+*.fdb_latexmk
+*.fls
+*.out
+*.toc
+*.gz
