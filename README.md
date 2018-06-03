@@ -7,7 +7,7 @@ The results are presented in the [report.pdf](https://github.com/rossrco/kiva_ph
 I'm delighted to announce that this project has been awarded the [5th place in the 'Data Science for Good: Kiva Crowdfunding' challenge](https://www.kaggle.com/kiva/data-science-for-good-kiva-crowdfunding/discussion/57352).
 
 ## Data Prerequisites
-In order to run the notebooks you will need the following `csv` files:
+In order to run the notebooks you will need the following `csv` files (download them and place them in the same folder as the `poverty_score.ipynb` notebook):
   * [kiva_loans.csv](https://www.kaggle.com/kiva/data-science-for-good-kiva-crowdfunding/data 'Kaggle')
   * [kiva_mpi_region_locations.csv](https://www.kaggle.com/kiva/data-science-for-good-kiva-crowdfunding/data 'Kaggle')
   * [Family Income and Expenditure.csv](https://www.kaggle.com/grosvenpaul/family-income-and-expenditure/data 'Kaggle')
