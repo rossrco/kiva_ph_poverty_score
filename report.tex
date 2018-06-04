@@ -48,6 +48,48 @@ The Kiva organization is a charitable entity that funds underprivileged people a
   \item Encouraging entrepreneurial initiative on the part of the borrower
 \end{itemize}
 In order to improve their reach, however, Kiva needs a good assessment of the poverty levels in their areas of operation. To do that, Kiva has requested in a \href{https://www.kaggle.com/kiva/data-science-for-good-kiva-crowdfunding}{Kaggle challenge} that a poverty score is created based on other data and that score is combined with a data set for Kiva’s loans from the last 2 years.
+
+The prior research in this area consists of two main bodies: the \href{https://en.wikipedia.org/wiki/Human_Poverty_Index}{Human Poverty Index}, developed in 1997 and the \href{https://en.wikipedia.org/wiki/Multidimensional_Poverty_Index}{Multidimensional Poverty Index}, introduced in 2010. The Human Poverty Index (HPI) focuses on the following metrics for defeloping countries:
+
+\begin{itemize}
+  \item Mortality
+  \item Illiteracy
+  \item Living conditions (access to water and access to nutrition)
+\end{itemize}
+
+For the so called 'high income OECD countries', the HPI uses the following metrics:
+
+\begin{itemize}
+  \item Mortality
+  \item Illiteracy
+  \item Income
+  \item Unemployment
+\end{itemize}
+
+The HPI is statistically-derived result that uses the formula:
+
+\begin{equation}
+  HPI = \Bigg[ \frac{\sum_{i = 1}^{n} P_i^\alpha}{n} \Bigg]^{\frac{1}{\alpha}}
+\end{equation}
+
+That is, the HPI is not predictive, but descriptive. In 2010, the HPI was replaced by the Multidimensional Poverty Index (MPI). As with the HPI, the MPI is a descriptive index. The MPI is based on more aspects of poverty, namely:
+
+\begin{itemize}
+  \item Child mortality
+  \item Nutrition
+  \item Years of education
+  \item School attendance
+  \item Energy and electricity
+  \item Water
+  \item Sanitation
+  \item Accomodation
+  \item Assets
+\end{itemize}
+
+The indicators above have different weights in the index and their sumproduct is weighted by the so-defined poverty's intensity.
+
+We will attempt to develop a predictive model that uses various factors mentioned above as predictors of lack of income. In this respect our model is more singular than the HPI and MPI, but on the other hand could use the indicators present in both indices as predictors.
+
 \hypertarget{prob_statement}{\subsection{Problem Statement}}
 %In this section, you will want to clearly define the problem that you are trying to solve, including the strategy (outline of tasks) you will use to achieve the desired solution. You should also thoroughly discuss what the intended solution will be for this problem. Questions to ask yourself when writing this section:
 %Is the problem statement clearly defined? Will the reader understand what you are expecting to solve?
@@ -115,6 +157,13 @@ We will utilize the following evaluation metrics for the household income predic
       EV(y, \hat{y}) = 1 - \frac{Var\{y - \hat{y}\}}{Var\{y\}}
     \end{equation}
 \end{itemize}
+
+As evident by our choice, we want to focus on two metrics for the errors in our model and two metrics to help us understand the model's robustness and potential future performance. The mean squared error and the mean squared logarithmic error will allow us to assess the deviation of our model's prediction from the target variable.
+
+We will also utilize the R2 score (the coefficient of determinations) - a mtric that represents the future performance of the model (how accurately new samples are expected to be predicted by the same model). Using this metric will allow us to build a robust model that could generalize well on new data.
+
+The explained variance score will allow us to assess how our model accounts for the deviation from the mean within our sample. This is important for us as we are trying to predict a spectrum of poverty. Or model is expected to account for the nuances of our target variable in the various regions where data is available. Therefore, we have to take the explained variance score into account as we refine our model.
+
 \section{Analysis}
 %(approx. 2-4 pages)
 \subsection{Data Exploration}
@@ -151,6 +200,16 @@ Here is a sample of the contents of the above-mentioned columns for 5 records:
 As we can see from this short example, the ‘region’ column could contain a ‘<city> <province>’ tuple (for loan id 1209550, where the city is Dipolog and the province is Zamboanga del Norte), only city (Masays for loan id 888025), municipality name (Roxas Palawan for loan id 1171969) or no valid value (‘NaN’ for loan id 867403). We will need to transform this column to a standard value using matching tables and other heuristics.
 
 For the records from the Philippines, the unique values for the ‘borrower\_genders’ column are only: ‘female’, ‘male’ and NaN. That’s why will also transform the ‘borrower\_genders’ column by mapping the ‘female’ category to 1 and the ‘male’ category to 0. There are only 80 records with missing values (NaN), so we could do away with them.
+
+Let us now take a look into some key characteristic distributions. The borrower gender distribution seems to be skewed strongly in favor of female borrowers:
+
+\begin{figure}[H]
+\caption{Number of Loans Per Region}
+\centering
+\includegraphics[width = 0.7 \textwidth]{borrower_gender_distribution}
+\end{figure}
+
+
 
 \subsubsection{Philippines Family Income and Expenditure Survey}
 The Philippines Family Income and Expenditure Survey (FIES) contains 41544 records of household incomes, expenditure, living conditions and other affluence indicators. The data set contains 59 columns representing information in the following categories:
