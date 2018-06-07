@@ -209,7 +209,13 @@ Let us now take a look into some key characteristic distributions. The borrower 
 \includegraphics[width = 0.7 \textwidth]{borrower_gender_distribution}
 \end{figure}
 
+The loan amount distribution is positively skewed with most of the weight at around 200 - 250 PHP.
 
+\begin{figure}[H]
+\caption{Number of Loans Per Region}
+\centering
+\includegraphics[width = 0.7 \textwidth]{kiva_loan_distribution}
+\end{figure}
 
 \subsubsection{Philippines Family Income and Expenditure Survey}
 The Philippines Family Income and Expenditure Survey (FIES) contains 41544 records of household incomes, expenditure, living conditions and other affluence indicators. The data set contains 59 columns representing information in the following categories:
@@ -309,6 +315,39 @@ It is obvious that this dataset will require a significant number of preprocessi
 \end{itemize}
 
 We will look at all those preprocessing operations in detail in the \hyperlink{data_prep}{Data Preprocessing} chapter.
+
+Let us now take a look into some key characteristic distributions. The distributions of the food expenses and household income are both positively skewed. However, the distribution of the household income is offset with regards to the food expenses (as expected, the income is mostly higher than the expenses):
+
+\begin{figure}[H]
+\caption{Number of Loans Per Region}
+\centering
+\includegraphics[width = 0.7 \textwidth]{house_inc_food_expenses_dist}
+\end{figure}
+
+Next, we can look at another important category - house and water expenses. The distribution is again positively skewed with most of the weight at around 150000 PHP:
+
+\begin{figure}[H]
+\caption{Number of Loans Per Region}
+\centering
+\includegraphics[width = 0.7 \textwidth]{house_water_expenses_dist}
+\end{figure}
+
+Another interesting feature is the house rental value. Here, since rental prices are more or less round number, some discrete steps of the distribution density can be observed:
+
+\begin{figure}[H]
+\caption{Number of Loans Per Region}
+\centering
+\includegraphics[width = 0.7 \textwidth]{house_rental_value_dist}
+\end{figure}
+
+The transport expenses variable is positively skewed with most of its weight between 0 and 2000 PHP. This should alert us to the fact that some of the poverty in the Philippines could be caused by its island terrain and consequently the isolated nature of some regions.
+
+\begin{figure}[H]
+\caption{Number of Loans Per Region}
+\centering
+\includegraphics[width = 0.7 \textwidth]{transport_expenses_dist}
+\end{figure}
+
 \subsection{Exploratory Visualization}
 %In this section, you will need to provide some form of visualization that summarizes or extracts a relevant characteristic or feature about the data. The visualization should adequately support the data being used. Discuss why this visualization was chosen and how it is relevant. Questions to ask yourself when writing this section:
 %Have you visualized a relevant characteristic or feature about the dataset or input data?
@@ -400,11 +439,20 @@ In our modeling work, we do not want to ignore any possibility for producing goo
 \begin{itemize}
   \item AdaBoost Regressor: Boosting algorithms generally work well out of the box and we will use this one as representative from its class.
   \item Support Vector Machines Regressor: Support vector machines allow us to find data trends in higher dimensions and translate them back to our existing feature space.
-  \item Stochastic Gradient Descent Regressor:
   \item Linear Regression: Linear regressions are simple and hold great explanatory power.
   \item Decision Tree Regressor: Decision trees can be visualized well and are not affected by outliers.
   \item Multi Layer Perceptron Regressor: This algorithm and its SciKit Learn implementation provide us with a quick and easy neural network class algorithm.
 \end{itemize}
+
+Let us now discuss how each of the models work. We will start with the AdaBoost regressor. The AdaBoost algorithm relies on using small decision tree stubs (or boolean expressions) to make simple cuts in the distribution of the input variables. It then assigns these segments values. Upon evaluation (at the end of each epoch), if mistakes are encountered their weight is amplified and a new process of creating stubs starts where the focus is on those amplified errors. At the end of that epoch, the algorithm evaluates itself and finds new errors. Those are in turn aplified. The process continues until convergence.
+
+The linear regression algorithm attempts to fit a line between a series of points. This is achieved by finding a line for which the total mean squared error for all points in the development sample is the smallest. The line's equation can then produce values for other points missing in the sample (predict). This algorithm's main weakness is its linearity - it cannot be applied on data trends of higher order.
+
+The support vector machines algorithm attempts to maximize the distance between zones with different values of the target variable. This is achieved by dividing them and maximizing the distnace between the vectors formed by the outer-most points of each category (a.k.a 'support vectors'). This is an improvement upon the method of the linear regression where a line could be drawn in many different ways through several points. With the SVMs the maximization of the distance between the support vectors guarantees that the line between the various categories (values) is drawn in an optimal way.
+
+The decision tree regressor attempts to split the input features into zones of values of the target variable (much like the AdaBoost regressor). The difference is that splits are done several levels done. Each split represents a binary question (e.g. 'are the food expenses below 10000 PHP?'). Each zone could thus be broken down into smaller and smaller areas until the algorithm fits well the distribution of points with different values.
+
+The Multilayer perceptron is SciKit Leanr's implementation of a neural network. Each perceptron is a digitally simulated neuron - it has several inputs (that mimic a neuron's dendrites) and an output (that mimics the neuron's axon). Upon certain signal received by the dendrites, the neuron activates and sends a signal down the axon. In the case of the perceptron, when the weighted sum of the inputs crosses a certain threshold value, the perceptron outputs 1 or 0. Depending on its activation function, the perceptron could output a probability of 1. In the case of the multilayer perceptron, the output of several perceptrons could become the input for another perceptron. Thus a network is formed between several groups of perceptrons that receive their input from another group of perceptrons. Each group is thus called a 'layer'. By building a neural network with many layers (a.k.a. deep neural network), the algorithm can abstract concepts on ever higher levels. For example, a convolutional neural network at its first layer could perceive edges, one level deeper it can perceive primitive shapes (straight lines, diagonal lines, circles). Still one layer further it could perceive objects such as eyes, noses and ears. One layer furhter, che neural network could perceive faces. For our specific case, the multilayer perceptron is not a convolutional neural network but could abstract numirc data to higher levels.
 
 \subsection{Benchmark}
 %In this section, you will need to provide a clearly defined benchmark result or threshold for comparing across performances obtained by your solution. The reasoning behind the benchmark (in the case where it is not an established result) should be discussed. Questions to ask yourself when writing this section:
@@ -786,6 +834,8 @@ The MLP regressor (at least in one of the dimensions if its matrix) has selected
 \end{itemize}
 
 Here, we have some features that we can work with and some features that would be difficult to implement. One aspect of the MLP regressor that is disadvantageous for us is the difficulty in understanding its decision matrix (let's remember that these are the weights of just one perceptron out of 100 in the first layer). At least we get a partial confirmation that the food\_expenses column is a very important feature.
+
+Finally, before moving on, we should mention that no major complications have occurred in our programming work. This is because all the models are implemented in the same library (SciKit Learn). Therefore, the models have a similar syntax, similar usage and utilize a similar workflow. This allowed us to reuse most of our code during the evaluation of all models. In addition, we implemented our dummy classifiers similarly to SciKit Learn's implementation (mimicking their functions of 'fit' and 'predict'). This also allowed us to reuse the evaluation code for all other regressors.
 
 \subsection{Refinement}
 %In this section, you will need to discuss the process of improvement you made upon the algorithms and techniques you used in your implementation. For example, adjusting parameters for certain models to acquire improved solutions would fall under the refinement category. Your initial and final solutions should be reported, as well as any significant intermediate results as necessary. Questions to ask yourself when writing this section:
