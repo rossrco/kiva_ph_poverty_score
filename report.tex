@@ -134,7 +134,7 @@ The dummy predictors will always predict poverty scores of 0, 0.5 and 1, respect
 The improvement will consist of selecting the features with highest predictive potential and discarding the rest. This will allow Kiva to easily integrate the model in their operation (by simply adding the 3-5 new questions to their loan application form).
 \subsubsection{Joining The Predicted Poverty To Existing Kiva Data}
 In this phase, we will find an appropriate way to join the results of the poverty prediction model to the existing Kiva loans data set. We will join the poverty scores by borrower gender and region.
-\subsection{Metrics}
+\hypertarget{metrics}{\subsection{Metrics}}
 %In this section, you will need to clearly define the metrics or calculations you will use to measure performance of a model or result in your project. These calculations and metrics should be justified based on the characteristics of the problem and problem domain. Questions to ask yourself when writing this section:
 %Are the metrics you’ve chosen to measure the performance of your models clearly discussed and defined?
 %Have you provided reasonable justification for the metrics chosen based on the problem and solution?
@@ -144,7 +144,7 @@ We will utilize the following evaluation metrics for the household income predic
     \begin{equation}
       MSE(y, \hat{y}) = \frac{1}{n_{samples}}\sum_{i=0}^{n_{samples} - 1}(y_i - \hat{y}_i)^2
     \end{equation}
-  \item R2 score:
+  \item \hypertarget{r2score}{R2 score}:
     \begin{equation}
       R^2(y, \hat{y}) = 1 - \frac{\sum_{i=0}^{n_{samples} - 1}(y_i - \hat{y}_i)^2}{\sum_{i=0}^{n_{samples} - 1}(y_i - \bar{y}_i)^2}
     \end{equation}
@@ -837,7 +837,7 @@ Here, we have some features that we can work with and some features that would b
 
 Finally, before moving on, we should mention that no major complications have occurred in our programming work. This is because all the models are implemented in the same library (SciKit Learn). Therefore, the models have a similar syntax, similar usage and utilize a similar workflow. This allowed us to reuse most of our code during the evaluation of all models. In addition, we implemented our dummy classifiers similarly to SciKit Learn's implementation (mimicking their functions of 'fit' and 'predict'). This also allowed us to reuse the evaluation code for all other regressors.
 
-\subsection{Refinement}
+\hypertarget{refinement}{\subsection{Refinement}}
 %In this section, you will need to discuss the process of improvement you made upon the algorithms and techniques you used in your implementation. For example, adjusting parameters for certain models to acquire improved solutions would fall under the refinement category. Your initial and final solutions should be reported, as well as any significant intermediate results as necessary. Questions to ask yourself when writing this section:
 %Has an initial solution been found and clearly reported?
 %Is the process of improvement clearly documented, such as what techniques were used?
@@ -912,6 +912,44 @@ We will now assess the performance after retraining (we are expecting a slight d
 %Has the final model been tested with various inputs to evaluate whether the model generalizes well to unseen data?
 %Is the model robust enough for the problem? Do small perturbations (changes) in training data or the input space greatly affect the results?
 %Can results found from the model be trusted?
+
+After the optimizations made in the \hyperlink{refinement}{Refinement section}, the final model we came up with is a decision tree regressor with the following hyperparameters:
+
+\begin{center}
+\begin{tabular}{ |l|l| }
+  \hline
+  hyperparameter & values\\
+  \hline
+  max depth & 100\\
+  min leaf nodes & 200\\
+  min samples leaf & 2\\
+  min samples split & 2\\
+  \hline
+\end{tabular}
+\end{center}
+
+The performance of the model according to our four \hyperlink{metrics}{evaluation metrics} is:
+
+\begin{center}
+\begin{tabular}{ |l|l| }
+  \hline
+  metric & value\\
+  \hline
+  mean\_squared\_error\_test & 0.000123\\
+  r2\_score\_test & 0.976352\\
+  mean\_squared\_log\_error\_test & 0.000035\\
+  explained\_variance\_score\_test & 0.976353\\
+  \hline
+\end{tabular}
+\end{center}
+
+There are several important features of the model we should mention:
+
+\begin{itemize}
+  \item Non-sensitivity to outliers. One of the conditions in the choice of our final model was robustness. Therefore, we selected the decision tree model since it is not sensitive to outliers.
+  \item Expected future robustness. One of our selected metrics was the \hyperlink{r2score}{R2 score}. This is not coincidental - the R2 score essentially predicts how likely is that our model will continue predicting correctly in the future. In this respect, our model has achieved more then 97\% in the R2 score metric. This is particularly reassuring since we can expect new points from the same population to be scored correctly.
+\end{itemize}
+
 We can now combine all predictions and derive the poverty score from the predicted normalized income. In the future, as we add more countries to the estimation, our poverty score will more and more reflect global levels. Here is an initial distribution description of our poverty score:
 
 \begin{center}
