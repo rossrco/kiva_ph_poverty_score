@@ -859,17 +859,47 @@ We'll start first by selecting the model. Based on the performance table, derive
 
 Next, we move on the the 3 features. Our choice is: food\_expenses, farming\_gardening\_expenses and agricultural\_household. We prefer the agricultural\_household feature as it seems easier to apply in the field, however its weight is less than 1\% of our model's prediction power, so we can drop it altogether.
 
-We'll now assess the performance after retraining (we are expecting a slight drop in performance because we limited ourselves to 2 features):
+We will use the \href{http://scikit-learn.org/stable/modules/generated/sklearn.model_selection.GridSearchCV.html}{grid search} technique to optimize the hyperparameters of our decision tree model. We will use the same metrics and evaluate a grid of the following optionscagainst them:
+
+\begin{center}
+\begin{tabular}{ |l|l| }
+  \hline
+  hyperparameter & values\\
+  \hline
+  max depth & 100, 200, 300, 400, 500\\
+  min leaf nodes & 100, 200, 300, 400, 500\\
+  min samples leaf & 2, 4, 6, 8, 10\\
+  min samples split & 2, 4, 6, 8, 10\\
+  \hline
+\end{tabular}
+\end{center}
+
+After the hyperparameter tuning, the resultant best model has the following hyperparameters:
+
+\begin{center}
+\begin{tabular}{ |l|l| }
+  \hline
+  hyperparameter & values\\
+  \hline
+  max depth & 100\\
+  min leaf nodes & 200\\
+  min samples leaf & 2\\
+  min samples split & 2\\
+  \hline
+\end{tabular}
+\end{center}
+
+We will now assess the performance after retraining (we are expecting a slight drop in performance because we limited ourselves to 2 features):
 
 \begin{center}
 \begin{tabular}{ |l|l| }
   \hline
   metric & value\\
   \hline
-  mean\_squared\_error\_test & 0.000203\\
-  r2\_score\_test & 0.961063\\
-  mean\_squared\_log\_error\_test & 0.000056\\
-  explained\_variance\_score\_test & 0.961064\\
+  mean\_squared\_error\_test & 0.000123\\
+  r2\_score\_test & 0.976352\\
+  mean\_squared\_log\_error\_test & 0.000035\\
+  explained\_variance\_score\_test & 0.976353\\
   \hline
 \end{tabular}
 \end{center}
